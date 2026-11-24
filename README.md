@@ -6,7 +6,7 @@
 
 一套面向 **Google Antigravity 2.0 桌面版** 的非破坏性、零外部依赖简体中文界面汉化工具，开箱即用，无需安装 Node.js、Python 或任何第三方依赖。
 
-> **快速下载**：直接前往 [**Releases 页面**](https://github.com/1-abxi/antigravity-zh-cn/releases/latest) 下载最新的 `antigravity-zh-cn.zip` 解压即可使用。
+> **快速下载**：直接前往 [**Releases 页面**](https://github.com/1-abxi/antigravity-zh-cn/releases/latest) 下载最新的 `Source code (zip)`（或点击右上角 `Code -> Download ZIP`）解压即可使用。
 
 ## 核心特点
 
