@@ -1,0 +1,4 @@
+{
+  "_comment": "可选：在此自定义或覆盖 Antigravity 界面的中文翻译（键值对：英文原文 -> 中文译文）。支持直接放于此目录，或复制到用户主目录下的 .antigravity-zh-cn-dict.json（永久补丁模式下无需重新打补丁即可生效）。",
+  "New Conversation": "新建对话"
+}
