@@ -1,12 +1,12 @@
 # Antigravity 2.0 简体中文 UI 汉化包 (`antigravity-zh-cn`)
 
-[![Release](https://img.shields.io/github/v/release/1-abxi/antigravity-zh-cn?color=blue&label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC)](https://github.com/1-abxi/antigravity-zh-cn/releases/latest)
+[![Release](https://img.shields.io/github/v/release/huilygyc/antigravity-zh-cn?color=blue&label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC)](https://github.com/huilygyc/antigravity-zh-cn/releases/latest)
 [![Platform](https://img.shields.io/badge/%E5%B9%B3%E5%8F%B0-Windows%20%7C%20macOS%20%7C%20Linux-success)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 一套面向 **Google Antigravity 2.0 桌面版** 的非破坏性、零外部依赖简体中文界面汉化工具，开箱即用，无需安装 Node.js、Python 或任何第三方依赖。
 
-> **快速下载**：直接前往 [**Releases 页面**](https://github.com/1-abxi/antigravity-zh-cn/releases/latest) 下载最新的 `Source code (zip)`（或点击右上角 `Code -> Download ZIP`）解压即可使用。
+> **快速下载**：直接前往 [**Releases 页面**](https://github.com/huilygyc/antigravity-zh-cn/releases/latest) 下载最新的 `Source code (zip)`（或点击右上角 `Code -> Download ZIP`）解压即可使用。
 
 ## 核心特点
 
