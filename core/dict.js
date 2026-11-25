@@ -3,7 +3,7 @@
 /**
  * Antigravity 2.0 简体中文 UI 词典
  *
- * 覆盖版本：Antigravity 2.0（含 v2.34.0 及相近版本）
+ * 覆盖版本：Antigravity 2.0（含 v2.34.0 / v2.35.1 及后续版本）
  * 涵盖范围：
  *   1. 原生菜单栏、系统托盘、更新器与系统弹窗
  *   2. 左侧边栏、对话列表、分组、筛选与排序
@@ -2394,6 +2394,60 @@ const EXACT_DICT = {
   'Couldn\'t edit queued message': '编辑排队消息失败',
   'Couldn\'t load message': '加载消息失败',
   'FAQ': '常见问题',
+
+  // =========================================================================
+  // 10. v3.0 新增：Antigravity v2.35.1+ 新特性与界面词条补全
+  // =========================================================================
+  'Inbox': '收件箱',
+  'Inbox Mode': '收件箱模式',
+  'Working Section': '进行中分区',
+  'Show Automations': '显示自动化',
+  'Show Plugins': '显示插件',
+  'Coordinators Options': '协调器选项',
+  'Application Menu': '应用菜单',
+  'Plugin permissions': '插件权限',
+  'Changes plugins can make without asking.': '插件无需询问即可执行的更改范围。',
+  'Permission': '权限',
+  'Orchestrator model selection': '编排器模型选择',
+  'Model selection': '模型选择',
+  'Default uses server-managed routing and Orchestrator quota. Custom pins specific models for orchestration and execution.': '“默认”使用服务端智能路由与编排器配额；“自定义”可分别固定编排模型与执行模型。',
+  'Baseline model quota reached': '已达基础模型配额上限',
+  'Dictation language options': '语音听写语言选项',
+  'Available dictation languages': '可选听写语言',
+  'Selected dictation languages': '已选听写语言',
+  'Search languages to add (e.g. English, Spanish, 中文, yue)...': '搜索并添加听写语言（如 English、中文、yue）...',
+  'Toggle language list': '展开/收起语言列表',
+  'Clone from Remote': '从远程克隆',
+  'Clone from This Computer': '从本机克隆',
+  'Clone locally': '克隆到本地',
+  'Cloud conversation': '云端对话',
+  'Continue as a new conversation': '作为新对话继续',
+  'Open in Remote': '在远程环境中打开',
+  'Open with': '打开方式',
+  'Personal agent running as you': '以你的个人身份运行的智能体',
+  'Shared agent for your team': '团队共享智能体',
+  'New agent': '新建智能体',
+  'No agents': '暂无智能体',
+  'Auto-Resolve': '自动解决',
+  'Resolved': '已解决',
+  'Active': '活动中',
+  'Stalled': '已停滞',
+  'Failed': '失败',
+  'Updating': '正在更新',
+  'Provisioning': '正在准备环境',
+  'Never': '从不',
+  '3 days': '最近 3 天',
+  'Type your own answer': '输入你的自定义回答',
+  'Add to Chat/Quote': '添加到对话 / 引用',
+  'Amend succeeded': '追加提交成功',
+  'Failed to send queued message': '发送排队消息失败',
+  'Search Repositories…': '搜索代码仓库…',
+  'Search by name or username': '按名称或用户名搜索',
+  'Search identities': '搜索身份',
+  'Subtitle': '副标题',
+  'Self-watch target presets': '自监听目标预设',
+  'Matches this automation\'s active identity.': '匹配当前自动化任务的生效身份。',
+  'Attackers might be able to see the images you\'re looking at on this site and trick you by modifying them.': '攻击者可能看到你在此网站浏览的图片，并通过篡改内容误导你。',
 };
 
 module.exports = { EXACT_DICT };

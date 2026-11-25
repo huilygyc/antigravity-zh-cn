@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Antigravity 2.0 渲染进程 DOM 汉化引擎构建器 (v2.0)
+ * Antigravity 2.0 渲染进程 DOM 汉化引擎构建器 (v3.0)
  *
  * 特性：
  * 1. React 虚拟 DOM 安全：仅修改 TextNode.nodeValue 与少量文本属性，绝不增删/替换 React 节点。
@@ -50,11 +50,19 @@ function buildRendererScript(dict, patternSpecs) {
 
   const EXACT = new Map();
   const NORM_EXACT = new Map();
+  // 多词安全忽略大小写映射（仅限含空格的多词短语，绝不触碰单词 Material Symbols 图标名！）
+  const LOWER_MULTI_EXACT = new Map();
   for (const [k, v] of Object.entries(DATA.dict)) {
     EXACT.set(k, v);
     const nk = normalizeLookup(k);
     if (nk && !NORM_EXACT.has(nk)) {
       NORM_EXACT.set(nk, v);
+    }
+    if (nk && nk.indexOf(' ') !== -1) {
+      const lk = nk.toLowerCase();
+      if (!LOWER_MULTI_EXACT.has(lk)) {
+        LOWER_MULTI_EXACT.set(lk, v);
+      }
     }
   }
   const PATTERNS = DATA.patternSpecs.map(([src, flags, rep]) => [new RegExp(src, flags), rep]);
@@ -143,6 +151,11 @@ function buildRendererScript(dict, patternSpecs) {
     if (hit === undefined) {
       normCore = normalizeLookup(core);
       hit = NORM_EXACT.get(normCore);
+    }
+
+    // 2.5 多词安全大小写不敏感回退（抵御官方版本升级把 Title Case 改成 Sentence case，如 "Automatic check for updates"）
+    if (hit === undefined && normCore && normCore.indexOf(' ') !== -1) {
+      hit = LOWER_MULTI_EXACT.get(normCore.toLowerCase());
     }
 
     // 3. 动态正则规则匹配

@@ -13,11 +13,15 @@ const os = require('os');
 const path = require('path');
 const Module = require('module');
 
-// 严格隔离：仅在 Electron 主进程 ('browser') 中生效，绝不干扰子进程、终端脚本、MCP 服务器或 ELECTRON_RUN_AS_NODE
+// 严格隔离：仅在 Antigravity 的 Electron 主进程 ('browser') 中生效，
+// 绝不干扰子进程、终端脚本、MCP 服务器、ELECTRON_RUN_AS_NODE 或其他 Electron 应用
+const execBase = path.basename(process.execPath || '').toLowerCase();
+const isAntigravityHost = execBase.includes('antigravity') || execBase.includes('electron');
 if (
   process.env.ELECTRON_RUN_AS_NODE ||
   !process.versions ||
   !process.versions.electron ||
+  !isAntigravityHost ||
   (process.type && process.type !== 'browser')
 ) {
   return;
