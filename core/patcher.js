@@ -311,7 +311,8 @@ function psSingleQuote(s) {
 }
 
 function runPowerShellEncoded(script, timeoutMs = 15000) {
-  const b64 = Buffer.from(script, 'utf16le').toString('base64');
+  const fullScript = '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8\n' + script;
+  const b64 = Buffer.from(fullScript, 'utf16le').toString('base64');
   return execFileSync('powershell', ['-NoProfile', '-WindowStyle', 'Hidden', '-EncodedCommand', b64], {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'ignore'],
