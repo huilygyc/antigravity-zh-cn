@@ -314,6 +314,7 @@ function runPowerShellEncoded(script, timeoutMs = 15000) {
   const b64 = Buffer.from(script, 'utf16le').toString('base64');
   return execFileSync('powershell', ['-NoProfile', '-WindowStyle', 'Hidden', '-EncodedCommand', b64], {
     encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
     timeout: timeoutMs,
   });
 }
@@ -429,19 +430,33 @@ function closeOtherAntigravityProcesses() {
   return listOtherRunningAntigravityPids().length === 0;
 }
 
-function createWindowsShortcut(lnkPath, targetPath, args, workingDir, iconLocation, description) {
+function createWindowsDesktopAndStartShortcuts(targetPath, args, workingDir, iconLocation, description) {
+  const startMenuPrograms = path.join(
+    process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'),
+    'Microsoft', 'Windows', 'Start Menu', 'Programs'
+  );
+  const startMenuLnk = path.join(startMenuPrograms, `${SHORTCUT_NAME}.lnk`);
   const psScript = [
     '$ws = New-Object -ComObject WScript.Shell',
-    `$s = $ws.CreateShortcut(${psSingleQuote(lnkPath)})`,
-    `$s.TargetPath = ${psSingleQuote(targetPath)}`,
-    args ? `$s.Arguments = ${psSingleQuote(args)}` : '',
-    workingDir ? `$s.WorkingDirectory = ${psSingleQuote(workingDir)}` : '',
-    iconLocation ? `$s.IconLocation = ${psSingleQuote(iconLocation)}` : '',
-    `$s.Description = ${psSingleQuote(description)}`,
-    '$s.Save()',
+    '$desktop = [Environment]::GetFolderPath("Desktop")',
+    `$desktopLnk = Join-Path $desktop ${psSingleQuote(SHORTCUT_NAME + '.lnk')}`,
+    `$targets = @($desktopLnk, ${psSingleQuote(startMenuLnk)})`,
+    'foreach ($lnk in $targets) {',
+    '  try {',
+    '    $s = $ws.CreateShortcut($lnk)',
+    `    $s.TargetPath = ${psSingleQuote(targetPath)}`,
+    args ? `    $s.Arguments = ${psSingleQuote(args)}` : '',
+    workingDir ? `    $s.WorkingDirectory = ${psSingleQuote(workingDir)}` : '',
+    iconLocation ? `    $s.IconLocation = ${psSingleQuote(iconLocation)}` : '',
+    `    $s.Description = ${psSingleQuote(description)}`,
+    '    $s.Save()',
+    '    Write-Output $lnk',
+    '  } catch {}',
+    '}',
   ].filter(Boolean).join('\n');
 
-  runPowerShellEncoded(psScript, 15000);
+  const out = runPowerShellEncoded(psScript, 15000);
+  return out.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
 }
 
 function getWindowsShortcutPaths() {
@@ -665,14 +680,8 @@ function cmdDeploy(customPath, overrideDeployDir, noShortcuts, skipInitialPatch)
       const vbsArgs = `//B //Nologo "${launchVbsPath}"`;
       const iconLoc = info.exePath ? `${info.exePath},0` : '';
       const desc = 'Antigravity 简体中文版（智能自愈防更新 · 升级后自动恢复中文）';
-      const { desktopLnk, startMenuLnk } = getWindowsShortcutPaths();
-
-      createWindowsShortcut(desktopLnk, wscriptExe, vbsArgs, deployDir, iconLoc, desc);
-      createdEntries.push(desktopLnk);
-      try {
-        createWindowsShortcut(startMenuLnk, wscriptExe, vbsArgs, deployDir, iconLoc, desc);
-        createdEntries.push(startMenuLnk);
-      } catch (_) {}
+      const made = createWindowsDesktopAndStartShortcuts(wscriptExe, vbsArgs, deployDir, iconLoc, desc);
+      for (const p of made) createdEntries.push(p);
     } else {
       console.log('[4/4] 已跳过系统快捷方式创建 (--no-shortcuts)。');
     }
@@ -1005,8 +1014,33 @@ function cmdShortcut(customPath, overrideDeployDir) {
   cmdDeploy(customPath, overrideDeployDir, false, false);
 }
 
+function printMenuBanner(customPath) {
+  console.log('');
+  console.log('======================================================================');
+  console.log(`      Antigravity 2.0 简体中文 UI 汉化工具 v${VERSION}（智能自愈防更新）`);
+  console.log('======================================================================');
+  if (customPath) {
+    console.log(`  当前指定路径：${customPath}`);
+    console.log('');
+  }
+  console.log('  [1] 一键安装「智能自愈防更新版」（强烈推荐！）');
+  console.log('      · 独立常驻目录，官方怎么自动更新都删不掉，装完下载包可删');
+  console.log('      · 生成零黑框「Antigravity 中文版」桌面/开始菜单图标（可固定任务栏）');
+  console.log('      · 官方升级覆盖后点中文图标，0.3 秒自动检测并无感恢复中文');
+  console.log('');
+  console.log('  [2] 仅安装/刷新补丁（直接修改 app.asar，不装常驻启动器）');
+  console.log('  [3] 立即启动中文版（若官方刚更新则自动自愈并启动）');
+  console.log('  [4] 卸载汉化并还原官方英文原版（清理常驻目录、快捷方式与补丁）');
+  console.log('  [5] 查看当前安装路径与汉化状态');
+  console.log('  [6] 手动指定 Antigravity 安装目录');
+  console.log('  [0] 退出');
+  console.log('');
+  console.log('  快捷键：Ctrl+Alt+L 秒切中英文  |  Ctrl+Alt+Shift+D 一键采集漏译');
+  console.log('======================================================================');
+}
+
 /**
- * 交互式 UTF-8 菜单（彻底取代 .bat 中文菜单，在任意 Windows 终端下 100% 零乱码）
+ * 交互式 UTF-8 菜单（用于 macOS / Linux 终端或具备标准输入的环境）
  */
 async function cmdMenu(initialCustomPath) {
   let customPath = initialCustomPath || '';
@@ -1015,28 +1049,7 @@ async function cmdMenu(initialCustomPath) {
 
   try {
     while (true) {
-      console.log('');
-      console.log('======================================================================');
-      console.log(`      Antigravity 2.0 简体中文 UI 汉化工具 v${VERSION}（智能自愈防更新）`);
-      console.log('======================================================================');
-      if (customPath) {
-        console.log(`  当前指定路径：${customPath}`);
-        console.log('');
-      }
-      console.log('  [1] 一键安装「智能自愈防更新版」（强烈推荐！）');
-      console.log('      · 独立常驻目录，官方怎么自动更新都删不掉，装完下载包可删');
-      console.log('      · 生成零黑框「Antigravity 中文版」桌面/开始菜单图标（可固定任务栏）');
-      console.log('      · 官方升级覆盖后点中文图标，0.3 秒自动检测并无感恢复中文');
-      console.log('');
-      console.log('  [2] 仅安装/刷新补丁（直接修改 app.asar，不装常驻启动器）');
-      console.log('  [3] 立即启动中文版（若官方刚更新则自动自愈并启动）');
-      console.log('  [4] 卸载汉化并还原官方英文原版（清理常驻目录、快捷方式与补丁）');
-      console.log('  [5] 查看当前安装路径与汉化状态');
-      console.log('  [6] 手动指定 Antigravity 安装目录');
-      console.log('  [0] 退出');
-      console.log('');
-      console.log('  快捷键：Ctrl+Alt+L 秒切中英文  |  Ctrl+Alt+Shift+D 一键采集漏译');
-      console.log('======================================================================');
+      printMenuBanner(customPath);
 
       const raw = (await ask('\n请输入数字选项并按回车 [1-6/0]: ')).trim();
       if (raw === '0' || raw.toLowerCase() === 'q') {
@@ -1087,6 +1100,10 @@ async function main() {
   const { cmd, customPath, deployDir, force, noShortcuts, gui, noSpawn, skipInitialPatch } = parseArgs(process.argv);
   try {
     switch (cmd) {
+      case 'print-menu':
+        printMenuBanner(customPath);
+        console.log('\n请输入上方数字选项 [1-6/0] 并按回车：');
+        break;
       case 'menu':
         await cmdMenu(customPath);
         break;

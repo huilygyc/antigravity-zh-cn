@@ -61,13 +61,77 @@ if not defined NODE_BIN (
     goto DETECT
 )
 
-if "%USE_ELECTRON_NODE%"=="1" set "ELECTRON_RUN_AS_NODE=1"
-if defined CUSTOM_PATH (
-    "%NODE_BIN%" "%CORE_DIR%\patcher.js" menu --path "%CUSTOM_PATH%"
+:MENU
+cls
+call :RUN print-menu
+set "CHOICE="
+set /p "CHOICE=>>> "
+
+if "%CHOICE%"=="1" goto DO_DEPLOY
+if "%CHOICE%"=="2" goto DO_INSTALL
+if "%CHOICE%"=="3" goto DO_LAUNCH
+if "%CHOICE%"=="4" goto DO_UNDEPLOY
+if "%CHOICE%"=="5" goto DO_STATUS
+if "%CHOICE%"=="6" goto DO_SETPATH
+if "%CHOICE%"=="0" exit /b 0
+if /i "%CHOICE%"=="q" exit /b 0
+goto MENU
+
+:RUN
+set "ACTION=%~1"
+if "%USE_ELECTRON_NODE%"=="1" (
+    set "ELECTRON_RUN_AS_NODE=1"
 ) else (
-    "%NODE_BIN%" "%CORE_DIR%\patcher.js" menu
+    set "ELECTRON_RUN_AS_NODE="
 )
-set "ERR=%errorlevel%"
+if defined CUSTOM_PATH (
+    "%NODE_BIN%" "%CORE_DIR%\patcher.js" %ACTION% --path "%CUSTOM_PATH%"
+) else (
+    "%NODE_BIN%" "%CORE_DIR%\patcher.js" %ACTION%
+)
 set "ELECTRON_RUN_AS_NODE="
-if not "%ERR%"=="0" pause
-exit /b %ERR%
+exit /b %errorlevel%
+
+:DO_DEPLOY
+echo.
+call :RUN deploy
+echo.
+pause
+goto MENU
+
+:DO_INSTALL
+echo.
+call :RUN install
+echo.
+pause
+goto MENU
+
+:DO_LAUNCH
+echo.
+call :RUN launch
+echo.
+pause
+goto MENU
+
+:DO_UNDEPLOY
+echo.
+call :RUN undeploy
+echo.
+pause
+goto MENU
+
+:DO_STATUS
+echo.
+call :RUN status
+echo.
+pause
+goto MENU
+
+:DO_SETPATH
+echo.
+echo Drag Antigravity folder or Antigravity.exe here (leave blank for auto-detect):
+set "NEW_PATH="
+set /p "NEW_PATH=>>> "
+set "NEW_PATH=!NEW_PATH:"=!"
+set "CUSTOM_PATH=!NEW_PATH!"
+goto DETECT
