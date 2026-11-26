@@ -72,11 +72,23 @@ function loadJsonDictSafe(filePath) {
   }
 }
 
-// 合并内置词典 + 目录内 user-dict.json + 用户主目录 ~/.antigravity-zh-cn-dict.json
+function getPersistentUserDictPath() {
+  if (process.platform === 'win32') {
+    const localAppData = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
+    return path.join(localAppData, 'antigravity-zh-cn', 'core', 'user-dict.json');
+  }
+  if (process.platform === 'darwin') {
+    return path.join(os.homedir(), 'Library', 'Application Support', 'antigravity-zh-cn', 'core', 'user-dict.json');
+  }
+  return path.join(os.homedir(), '.local', 'share', 'antigravity-zh-cn', 'core', 'user-dict.json');
+}
+
+// 合并内置词典 + 目录内 user-dict.json + 常驻目录 user-dict.json + 用户主目录 ~/.antigravity-zh-cn-dict.json
 const MERGED_DICT = Object.assign(
   {},
   EXACT_DICT,
   loadJsonDictSafe(path.join(__dirname, 'user-dict.json')),
+  loadJsonDictSafe(getPersistentUserDictPath()),
   loadJsonDictSafe(path.join(os.homedir(), '.antigravity-zh-cn-dict.json'))
 );
 

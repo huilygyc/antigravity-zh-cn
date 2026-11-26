@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 setlocal EnableExtensions EnableDelayedExpansion
-title 启动 Antigravity（简体中文无侵入模式）
+title Antigravity 2.0 zh-CN Launcher v3.1
 
 set "ROOT_DIR=%~dp0"
 if "%ROOT_DIR:~-1%"=="\" set "ROOT_DIR=%ROOT_DIR:~0,-1%"
@@ -32,18 +32,17 @@ if not defined NODE_BIN (
 )
 
 if not defined NODE_BIN (
-    echo ❌ 未能自动找到 Antigravity.exe，请改用“一键汉化工具.bat”并手动指定路径。
+    echo Antigravity.exe was not found in default paths. Please use the main tool bat instead.
     pause
     exit /b 1
 )
 
 if "%USE_ELECTRON_NODE%"=="1" set "ELECTRON_RUN_AS_NODE=1"
-"%NODE_BIN%" "%CORE_DIR%\patcher.js" launch
+"%NODE_BIN%" "%CORE_DIR%\patcher.js" launch --gui
 set "ERR=%errorlevel%"
 set "ELECTRON_RUN_AS_NODE="
 
 if not "%ERR%"=="0" (
-    echo.
     pause
     exit /b %ERR%
 )
